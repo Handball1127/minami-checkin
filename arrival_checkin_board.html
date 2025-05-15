@@ -5,7 +5,7 @@
   <meta charset="UTF-8" />
   <meta name="viewport" content="width=device-width, initial-scale=1.0" />
   <title>Minami 光波接待看板</title>
-  <style>
+  <style id="theme-style">
     body {
       font-family: "Helvetica Neue", sans-serif;
       background: #FAF3E5;
@@ -17,9 +17,14 @@
       text-align: center;
       color: #A15C45;
     }
+    .toolbar {
+      display: flex;
+      justify-content: space-between;
+      align-items: center;
+      margin: 1rem 0;
+    }
     .date-picker {
       text-align: center;
-      margin: 1rem 0;
     }
     input[type="date"], input[type="password"] {
       padding: 0.5rem;
@@ -61,18 +66,23 @@
     .hidden { display: none; }
 
     @media (max-width: 768px) {
-      body {
-        padding: 1rem;
-      }
-      .slot {
-        padding: 0.75rem;
-      }
-      .time {
-        font-size: 1.1rem;
-      }
-      .guest {
-        font-size: 0.95rem;
-      }
+      body { padding: 1rem; }
+      .slot { padding: 0.75rem; }
+      .time { font-size: 1.1rem; }
+      .guest { font-size: 0.95rem; }
+    }
+
+    /* 夜間模式 */
+    .night body {
+      background: #222;
+      color: #f2f2f2;
+    }
+    .night .slot {
+      background: #2f2f2f;
+      border-color: #BF5656;
+    }
+    .night .time {
+      color: #BF8136;
     }
   </style>
 </head>
@@ -86,16 +96,19 @@
   </div>
 
   <div id="main-page" class="hidden">
-    <h1>Minami 光波接待看板</h1>
-    <div class="date-picker">
-      <label for="select-date">選擇日期：</label>
-      <input type="date" id="select-date" />
+    <div class="toolbar">
+      <div class="date-picker">
+        <label for="select-date">選擇日期：</label>
+        <input type="date" id="select-date" />
+      </div>
+      <button onclick="toggleTheme()">🌗 切換主題</button>
     </div>
+    <h1>Minami 光波接待看板</h1>
     <div id="checkin-board"></div>
   </div>
 
   <script>
-    const PASSWORD = "minami2025";  // ← 你可以改成自己的密碼
+    const PASSWORD = "minami2025";
     const endpoint = "https://script.google.com/macros/s/AKfycbwkFbwyhbOKrBHtJmZIolBJ8zy535VrORWCscVf0XvXXAiExow2JDYdJL0BpTqtpAtuzA/exec";
 
     function checkPassword() {
@@ -107,6 +120,10 @@
       } else {
         document.getElementById("login-error").textContent = "密碼錯誤，請再試一次。";
       }
+    }
+
+    function toggleTheme() {
+      document.body.classList.toggle("night");
     }
 
     function groupBySlot(data) {
@@ -150,13 +167,19 @@
             div.className = "slot";
             if (slot === nowSlot) div.classList.add("active");
             div.innerHTML = `<div class="time">${slot}</div>`;
+            let total = 0;
             grouped[slot].forEach(g => {
               const p = document.createElement("div");
               p.className = "guest";
               p.textContent = `${g.name}（${g.phone}）｜${g.count}人｜${g.items}`;
               p.addEventListener("click", () => p.classList.toggle("checked"));
               div.appendChild(p);
+              total += parseInt(g.count || 0);
             });
+            const totalDiv = document.createElement("div");
+            totalDiv.style.marginTop = "0.5rem";
+            totalDiv.innerHTML = `👥 總人數：${total}人`;
+            div.appendChild(totalDiv);
             board.appendChild(div);
           });
         });
@@ -168,7 +191,7 @@
       input.value = today;
       input.addEventListener("change", () => loadData(input.value));
       loadData(today);
-      setInterval(() => loadData(input.value), 60000); // 每 60 秒自動更新
+      setInterval(() => loadData(input.value), 60000);
     }
   </script>
 </body>
