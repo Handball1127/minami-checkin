@@ -65,24 +65,29 @@
     }
     .hidden { display: none; }
 
+    /* 夜間主題 */
+    .night body {
+      background: #1E1E1E;
+      color: #F0F0F0;
+    }
+    .night .slot {
+      background: #2C2C2C;
+      border-color: #BF5656;
+    }
+    .night .time {
+      color: #F3D4AB;
+    }
+    .night input, .night button {
+      background: #333;
+      color: #F0F0F0;
+      border-color: #555;
+    }
+
     @media (max-width: 768px) {
       body { padding: 1rem; }
       .slot { padding: 0.75rem; }
       .time { font-size: 1.1rem; }
       .guest { font-size: 0.95rem; }
-    }
-
-    /* 夜間模式 */
-    .night body {
-      background: #222;
-      color: #f2f2f2;
-    }
-    .night .slot {
-      background: #2f2f2f;
-      border-color: #BF5656;
-    }
-    .night .time {
-      color: #BF8136;
     }
   </style>
 </head>
@@ -190,8 +195,7 @@
       const input = document.getElementById("select-date");
       input.value = today;
       input.addEventListener("change", () => loadData(input.value));
-      loadData(today);
-      setInterval(() => loadData(input.value), 60000);
+      loadData(today);  // 初始只載入一次
     }
   </script>
 </body>
