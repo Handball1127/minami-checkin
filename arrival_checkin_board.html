@@ -1,0 +1,62 @@
+
+<!DOCTYPE html>
+<html lang="zh-Hant">
+<head>
+  <meta charset="UTF-8" />
+  <meta name="viewport" content="width=device-width, initial-scale=1.0" />
+  <title>今日接待看板</title>
+  <style>
+    body {
+      font-family: "Helvetica Neue", sans-serif;
+      background: #f9f9f9;
+      padding: 2rem;
+      color: #333;
+    }
+    h1 {
+      text-align: center;
+      color: #BF5656;
+    }
+    .slot {
+      margin: 1rem 0;
+      border-left: 4px solid #BF5656;
+      padding-left: 1rem;
+    }
+    .time {
+      font-size: 1.25rem;
+      font-weight: bold;
+      margin-bottom: 0.5rem;
+    }
+    .guest {
+      font-size: 1rem;
+      margin: 0.25rem 0;
+      cursor: pointer;
+    }
+    .guest.checked {
+      text-decoration: line-through;
+      color: #999;
+    }
+  </style>
+</head>
+<body>
+  <h1>今日接待看板</h1>
+
+  <div class="slot">
+    <div class="time">12:00–14:00</div>
+    <div class="guest">林○○（098****123）｜2人｜套餐A x1、蛋糕 x1</div>
+    <div class="guest">王○○（091****456）｜1人｜套餐B x1</div>
+  </div>
+
+  <div class="slot">
+    <div class="time">14:00–16:00</div>
+    <div class="guest">陳○○（092****789）｜3人｜蛋糕 x2</div>
+  </div>
+
+  <script>
+    document.querySelectorAll('.guest').forEach(g => {
+      g.addEventListener('click', () => {
+        g.classList.toggle('checked');
+      });
+    });
+  </script>
+</body>
+</html>
