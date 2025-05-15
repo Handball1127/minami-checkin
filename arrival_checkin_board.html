@@ -55,46 +55,12 @@
       text-decoration: line-through;
       color: #999;
     }
-    .night body {
-      background: #1B6C8C;
-      color: #FFFFFF;
-    }
-    .night .slot {
-      background: #6B4F3B;
-      border-color: #FFD36B;
-    }
-    .night .time {
-      color: #FFD36B;
-    }
-    .night input {
-      background: #1B6C8C;
-      color: #FFF;
-      border: 1px solid #FFD36B;
-    }
-    .night .guest {
-      color: #FFF;
-    }
-    button {
-      padding: 0.5rem 1rem;
-      font-size: 1rem;
-      margin-left: 1rem;
-      border: none;
-      border-radius: 6px;
-      background: #BF5656;
-      color: white;
-      cursor: pointer;
-    }
     .note {
       background: #FFF0F0;
       padding: 1rem;
       margin-top: 2rem;
       border-left: 4px solid #BF5656;
       border-radius: 8px;
-    }
-    .night .note {
-      background: #403027;
-      border-left-color: #FFD36B;
-      color: #FFFFFF;
     }
   </style>
 </head>
@@ -170,20 +136,29 @@
               div.appendChild(p);
               slotTotal += parseInt(g.count || 0);
 
-              if (g.items.includes("套餐A")) {
-                const m = g.items.match(/套餐A\sx(\d+)/);
-                if (m) totalSetA += parseInt(m[1]);
+              const items = g.items;
+              if (items.includes("套餐A")) {
+                const m = items.match(/套餐A\sx(\d+)/);
+                if (m) {
+                  const n = parseInt(m[1]);
+                  totalSetA += n;
+                  totalCake += n;
+                }
               }
-              if (g.items.includes("套餐B")) {
-                const m = g.items.match(/套餐B\sx(\d+)/);
-                if (m) totalSetB += parseInt(m[1]);
+              if (items.includes("套餐B")) {
+                const m = items.match(/套餐B\sx(\d+)/);
+                if (m) {
+                  const n = parseInt(m[1]);
+                  totalSetB += n;
+                  totalCup += n;
+                }
               }
-              if (g.items.includes("草莓蛋糕")) {
-                const m = g.items.match(/草莓蛋糕\sx(\d+)/);
+              if (items.includes("草莓蛋糕")) {
+                const m = items.match(/草莓蛋糕\sx(\d+)/);
                 if (m) totalCake += parseInt(m[1]);
               }
-              if (g.items.includes("甜點杯")) {
-                const m = g.items.match(/甜點杯\sx(\d+)/);
+              if (items.includes("甜點杯")) {
+                const m = items.match(/甜點杯\sx(\d+)/);
                 if (m) totalCup += parseInt(m[1]);
               }
             });
@@ -201,8 +176,8 @@
             <strong>📦 當日餐點總計：</strong><br>
             套餐A：${totalSetA} 份<br>
             套餐B：${totalSetB} 份<br>
-            草莓蛋糕：${totalCake} 份<br>
-            甜點杯：${totalCup} 份
+            草莓蛋糕（含套餐A）：${totalCake} 份<br>
+            甜點杯（含套餐B）：${totalCup} 份
           `;
           board.appendChild(totalBox);
         });
