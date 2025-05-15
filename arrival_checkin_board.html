@@ -2,29 +2,45 @@
 <!DOCTYPE html>
 <html lang="zh-Hant">
 <head>
-  <meta charset="UTF-8" />
-  <meta name="viewport" content="width=device-width, initial-scale=1.0" />
-  <title>今日接待看板</title>
+  <meta charset="UTF-8">
+  <meta name="viewport" content="width=device-width, initial-scale=1.0">
+  <title>Minami 光波接待看板</title>
   <style>
     body {
       font-family: "Helvetica Neue", sans-serif;
-      background: #f9f9f9;
+      background: #FAF3E5;
       padding: 2rem;
-      color: #333;
+      color: #3F4A58;
     }
     h1 {
       text-align: center;
-      color: #BF5656;
+      color: #A15C45;
+      margin-bottom: 1rem;
+    }
+    .date-picker {
+      text-align: center;
+      margin-bottom: 1.5rem;
+    }
+    input[type="date"] {
+      padding: 0.5rem;
+      font-size: 1rem;
+      border-radius: 6px;
+      border: 1px solid #ccc;
     }
     .slot {
       margin: 1rem 0;
-      border-left: 4px solid #BF5656;
+      border-left: 4px solid #A15C45;
       padding-left: 1rem;
+      background: #FFF;
+      box-shadow: 0 1px 4px rgba(0,0,0,0.05);
+      border-radius: 8px;
+      padding: 1rem;
     }
     .time {
-      font-size: 1.25rem;
+      font-size: 1.2rem;
       font-weight: bold;
       margin-bottom: 0.5rem;
+      color: #1B6C8C;
     }
     .guest {
       font-size: 1rem;
@@ -38,25 +54,62 @@
   </style>
 </head>
 <body>
-  <h1>今日接待看板</h1>
-
-  <div class="slot">
-    <div class="time">12:00–14:00</div>
-    <div class="guest">林○○（098****123）｜2人｜套餐A x1、蛋糕 x1</div>
-    <div class="guest">王○○（091****456）｜1人｜套餐B x1</div>
+  <h1>Minami 光波接待看板</h1>
+  <div class="date-picker">
+    <label for="select-date">選擇日期：</label>
+    <input type="date" id="select-date">
   </div>
-
-  <div class="slot">
-    <div class="time">14:00–16:00</div>
-    <div class="guest">陳○○（092****789）｜3人｜蛋糕 x2</div>
-  </div>
+  <div id="checkin-board"></div>
 
   <script>
-    document.querySelectorAll('.guest').forEach(g => {
-      g.addEventListener('click', () => {
-        g.classList.toggle('checked');
-      });
+    const endpoint = "https://script.google.com/macros/s/AKfycbwkFbwyhbOKrBHtJmZIolBJ8zy535VrORWCscVf0XvXXAiExow2JDYdJL0BpTqtpAtuzA/exec";
+
+    document.getElementById("select-date").addEventListener("change", e => {
+      const date = e.target.value;
+      loadData(date);
     });
+
+    function groupBySlot(data) {
+      const result = {};
+      data.forEach(entry => {
+        if (!result[entry.slot]) result[entry.slot] = [];
+        result[entry.slot].push(entry);
+      });
+      return result;
+    }
+
+    function loadData(date) {
+      const board = document.getElementById("checkin-board");
+      board.innerHTML = "Loading...";
+      fetch(`${endpoint}?action=getCheckinData&date=${date}`)
+        .then(res => res.json())
+        .then(json => {
+          if (!json.success) {
+            board.innerHTML = "⚠️ 無法載入資料";
+            return;
+          }
+          const grouped = groupBySlot(json.data);
+          board.innerHTML = "";
+          const slots = Object.keys(grouped).sort();
+          slots.forEach(slot => {
+            const div = document.createElement("div");
+            div.className = "slot";
+            div.innerHTML = `<div class="time">${slot}</div>`;
+            grouped[slot].forEach(g => {
+              const p = document.createElement("div");
+              p.className = "guest";
+              p.textContent = `${g.name}（${g.phone}）｜${g.count}人｜${g.items}`;
+              p.addEventListener("click", () => p.classList.toggle("checked"));
+              div.appendChild(p);
+            });
+            board.appendChild(div);
+          });
+        });
+    }
+
+    const today = new Date().toISOString().split("T")[0];
+    document.getElementById("select-date").value = today;
+    loadData(today);
   </script>
 </body>
 </html>
