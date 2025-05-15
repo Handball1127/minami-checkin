@@ -5,7 +5,7 @@
   <meta charset="UTF-8" />
   <meta name="viewport" content="width=device-width, initial-scale=1.0" />
   <title>Minami 光波接待看板</title>
-  <style id="theme-style">
+  <style>
     body {
       font-family: "Helvetica Neue", sans-serif;
       background: #FAF3E5;
@@ -23,10 +23,7 @@
       align-items: center;
       margin: 1rem 0;
     }
-    .date-picker {
-      text-align: center;
-    }
-    input[type="date"], input[type="password"] {
+    input[type="date"] {
       padding: 0.5rem;
       font-size: 1rem;
       border-radius: 6px;
@@ -59,73 +56,48 @@
       text-decoration: line-through;
       color: #999;
     }
-    .login-box {
-      text-align: center;
-      margin-top: 5rem;
-    }
-    .hidden { display: none; }
-
-    /* 夜間主題 */
     .night body {
-      background: #1E1E1E;
-      color: #F0F0F0;
+      background: #1B6C8C;
+      color: #F2F2F2;
     }
     .night .slot {
-      background: #2C2C2C;
-      border-color: #BF5656;
+      background: #235d7c;
+      border-color: #F2F2F2;
     }
     .night .time {
-      color: #F3D4AB;
+      color: #FFDDAA;
     }
-    .night input, .night button {
-      background: #333;
-      color: #F0F0F0;
-      border-color: #555;
+    .night input {
+      background: #235d7c;
+      color: #F2F2F2;
+      border: 1px solid #eee;
     }
-
-    @media (max-width: 768px) {
-      body { padding: 1rem; }
-      .slot { padding: 0.75rem; }
-      .time { font-size: 1.1rem; }
-      .guest { font-size: 0.95rem; }
+    button {
+      padding: 0.5rem 1rem;
+      font-size: 1rem;
+      margin-left: 1rem;
+      border: none;
+      border-radius: 6px;
+      background: #BF5656;
+      color: white;
+      cursor: pointer;
     }
   </style>
 </head>
 <body>
-  <div id="login-page" class="login-box">
-    <h1>🔒 Minami 光波接待看板</h1>
-    <p>請輸入密碼以進入</p>
-    <input type="password" id="password-input" placeholder="請輸入密碼" />
-    <button onclick="checkPassword()">登入</button>
-    <p id="login-error" style="color:#A15C45;"></p>
+  <div class="toolbar">
+    <div>
+      <label for="select-date">選擇日期：</label>
+      <input type="date" id="select-date" />
+    </div>
+    <button onclick="toggleTheme()">🌗 切換主題</button>
   </div>
 
-  <div id="main-page" class="hidden">
-    <div class="toolbar">
-      <div class="date-picker">
-        <label for="select-date">選擇日期：</label>
-        <input type="date" id="select-date" />
-      </div>
-      <button onclick="toggleTheme()">🌗 切換主題</button>
-    </div>
-    <h1>Minami 光波接待看板</h1>
-    <div id="checkin-board"></div>
-  </div>
+  <h1>Minami 光波接待看板</h1>
+  <div id="checkin-board">Loading...</div>
 
   <script>
-    const PASSWORD = "minami2025";
     const endpoint = "https://script.google.com/macros/s/AKfycbwkFbwyhbOKrBHtJmZIolBJ8zy535VrORWCscVf0XvXXAiExow2JDYdJL0BpTqtpAtuzA/exec";
-
-    function checkPassword() {
-      const input = document.getElementById("password-input").value;
-      if (input === PASSWORD) {
-        document.getElementById("login-page").classList.add("hidden");
-        document.getElementById("main-page").classList.remove("hidden");
-        initCheckinBoard();
-      } else {
-        document.getElementById("login-error").textContent = "密碼錯誤，請再試一次。";
-      }
-    }
 
     function toggleTheme() {
       document.body.classList.toggle("night");
@@ -155,7 +127,7 @@
 
     function loadData(date) {
       const board = document.getElementById("checkin-board");
-      board.innerHTML = "Loading...";
+      board.innerHTML = "載入中...";
       fetch(`${endpoint}?action=getCheckinData&date=${date}`)
         .then(res => res.json())
         .then(json => {
@@ -190,13 +162,15 @@
         });
     }
 
-    function initCheckinBoard() {
-      const today = new Date().toISOString().split("T")[0];
+    function initBoard() {
       const input = document.getElementById("select-date");
+      const today = new Date().toISOString().split("T")[0];
       input.value = today;
+      loadData(today);
       input.addEventListener("change", () => loadData(input.value));
-      loadData(today);  // 初始只載入一次
     }
+
+    document.addEventListener("DOMContentLoaded", initBoard);
   </script>
 </body>
 </html>
